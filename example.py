@@ -1,6 +1,6 @@
 """An example of how to use the picross_solver package."""
 
-from picross_solver.puzzle import Puzzle
+from picross_solver import Picross
 
 row_clues = [
     [4],
@@ -24,7 +24,7 @@ col_clues = [
     [5],
 ]
 
-puzzle = Puzzle(row_clues, col_clues)
+puzzle = Picross(row_clues, col_clues)
 puzzle.solve()
 
 print(puzzle)

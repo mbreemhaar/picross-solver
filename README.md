@@ -7,12 +7,12 @@ you throw at it.
 ## Usage
 
 Using the Picross solver is simple. Just create a new instance of the 
-`Puzzle` and pass in the clues for the rows and columns. Then call the
+`Picross` and pass in the clues for the rows and columns. Then call the
 `solve` method to solve the puzzle. To show the solution, simply print the
 puzzle instance.
 
 ```python
-from picross_solver.puzzle import Puzzle
+from picross_solver import Picross
 
 row_clues = [
     [4],
