@@ -4,3 +4,16 @@ version = "0.1.0"
 description = "A Python package that can solve Picross puzzles."
 requires-python = ">=3.11"
 dependencies = []
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D104", "D203", "D213"]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.per-file-ignores]
+"example.py" = ["T201"]

@@ -1,27 +1,37 @@
-from functools import lru_cache
-import itertools
-from typing import Generator
+"""Picross puzzle solver."""
 
+import itertools
+from collections.abc import Generator
 
 
 class Line:
-    def __init__(self, cells: list[bool | None], clues: list[int]):
+    """A line in the Picross puzzle."""
+
+    def __init__(self, cells: list[bool | None], clues: list[int]) -> None:
+        """Initialize the line with cells and clues."""
         self._cells = cells
         self._clues = clues
 
     @property
     def cells(self) -> list[bool | None]:
+        """Get the cells for the line."""
         return self._cells
 
     @property
     def clues(self) -> list[int]:
+        """Get the clues for the line."""
         return self._clues
 
     @property
     def is_solved(self) -> bool:
+        """Check if the line is solved.
+
+        :return: True if the line is solved, False otherwise.
+        """
         return all(cell is not None for cell in self._cells)
 
     def __str__(self) -> str:
+        """Return a string representation of the line using emojis."""
         output = ''
         for cell in self._cells:
             if cell is None:
@@ -33,11 +43,8 @@ class Line:
 
         return output + ' '
 
-    @lru_cache
-    def get_all_possible_lines(self) -> Generator[list[bool], None, None]:
-        """
-        Generate all possible lines that match the clues, considering the known cells.
-        """
+    def get_all_possible_lines(self) -> Generator[list[bool], None, None]:  # noqa: C901
+        """Generate all possible lines that match the clues, considering the known cells."""
         # 1. Sum the clues to get the total number of filled cells
         # 2. Create all possible permutations of filled and empty cells
         # 3. Filter the permutations to match the known cells
@@ -75,19 +82,20 @@ class Line:
                 for cell in permutation:
                     if cell:
                         current_clue += 1
-                    else:
-                        if current_clue > 0:
-                            permutation_clues.append(current_clue)
-                            current_clue = 0
+                    elif current_clue > 0:
+                        permutation_clues.append(current_clue)
+                        current_clue = 0
                 if current_clue > 0:
                     permutation_clues.append(current_clue)
 
             if self.clues != permutation_clues:
                 continue
 
+            # Step 5: Yield the valid lines
             yield permutation
 
     def refresh_known_cells(self) -> None:
+        """Refresh the known cells in the line based on the possible lines."""
         possible_lines = list(self.get_all_possible_lines())
 
         for i, cell in enumerate(self._cells):
@@ -100,43 +108,69 @@ class Line:
                 self._cells[i] = False
 
 class Puzzle:
-    def __init__(self, row_clues: list[list[int]], col_clues: list[list[int]]):
+    """A Picross puzzle."""
+
+    def __init__(self, row_clues: list[list[int]], col_clues: list[list[int]]) -> None:
+        """Initialize the puzzle with row and column clues."""
         self._row_clues = row_clues
         self._col_clues = col_clues
         self._grid = [[None] * self.col_count for _ in range(self.row_count)]
 
     @property
     def row_count(self) -> int:
+        """Get the number of rows in the puzzle.
+
+        :return: The number of rows in the puzzle.
+        """
         return len(self._row_clues)
 
     @property
     def col_count(self) -> int:
+        """Get the number of columns in the puzzle.
+
+        :return: The number of columns in the puzzle.
+        """
         return len(self._col_clues)
 
     @property
     def grid(self) -> list[list[bool | None]]:
+        """Get the current state of the grid.
+
+        :return: The current state of the grid.
+        """
         return self._grid
 
     @property
     def is_solved(self) -> bool:
+        """Check if the puzzle is solved.
+
+        :return: True if the puzzle is solved, False otherwise.
+        """
         return all(all(cell is not None for cell in row) for row in self._grid)
 
     def update_row(self, row_index: int, cells: list[bool | None]) -> None:
+        """Update a row in the grid with the given cells."""
         if row_index < 0 or row_index >= self.row_count:
-            raise IndexError("Row index out of range")
+            e = 'Row index out of range'
+            raise IndexError(e)
         if len(cells) != self.col_count:
-            raise ValueError("Cells length does not match column count")
+            e = 'Cells length does not match column count'
+            raise ValueError(e)
         self._grid[row_index] = cells
 
     def update_col(self, col_index: int, cells: list[bool | None]) -> None:
+        """Update a column in the grid with the given cells."""
         if col_index < 0 or col_index >= self.col_count:
-            raise IndexError("Column index out of range")
+            e = 'Column index out of range'
+            raise IndexError(e)
         if len(cells) != self.row_count:
-            raise ValueError("Cells length does not match row count")
+            e = 'Cells length does not match row count'
+            raise ValueError(e)
         for i in range(self.row_count):
             self._grid[i][col_index] = cells[i]
 
-    def solve(self):
+    def solve(self) -> None:
+        """Solve the puzzle by iterating through the rows and columns."""
         while not self.is_solved:
             for i in range(self.row_count):
                 line = Line(self._grid[i], self._row_clues[i])
@@ -149,6 +183,10 @@ class Puzzle:
                 self.update_col(i, line.cells)
 
     def __str__(self) -> str:
+        """Return a string representation of the puzzle using emojis.
+
+        :return: String representation of the puzzle.
+        """
         output = ''
         for row in self._grid:
             output += str(Line(row, [])) + '\n'
