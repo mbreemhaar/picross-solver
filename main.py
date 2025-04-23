@@ -1,9 +1,9 @@
-from picross_solver.puzzle import Line
+from picross_solver.puzzle import Puzzle
 
-cells = [None, True, None, None, None, None, None, None, None, None]
-clues = [2]
+row_clues = [[3,1,1], [1,1,1], [3,2,1], [2,2,1], [6], [1,1], [4], [2], [2,3,1], [1,3,2]]
+col_clues = [[2,1],[1,2,2], [1,1], [1,2,1],[4,1,1],[1,3,1,2],[1,1,1,1],[1,1,1],[1,1,1,1], [2,1,1,3]]
 
-line = Line(cells, clues)
+puzzle = Puzzle(row_clues, col_clues)
+puzzle.solve()
 
-for possible_line in line.get_all_possible_lines():
-    print(possible_line)
+print(puzzle)
